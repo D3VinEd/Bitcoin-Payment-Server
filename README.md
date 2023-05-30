@@ -1,1 +1,1 @@
-# Bitcoin-Payment-Module
+# Bitcoin-Payment-Server
