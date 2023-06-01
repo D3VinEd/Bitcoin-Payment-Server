@@ -6,16 +6,16 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from jwt.exceptions import InvalidTokenError
 
-router = APIRouter()
-security = HTTPBearer()
-config = ConfigManager()
-
 class Transaction(BaseModel):
     recipient: str
     amount: float
 
 class User(BaseModel):
     user_id: str
+
+router = APIRouter()
+security = HTTPBearer()
+config = ConfigManager()
 
 def authenticate_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:

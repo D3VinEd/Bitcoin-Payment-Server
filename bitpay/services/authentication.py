@@ -1,14 +1,22 @@
 from functools import wraps
 from flask import request, jsonify
-
+# @ToDo: FastAPI
 # Beispielbenutzerdaten
 USERNAME = 'admin'
 PASSWORD = 'geheim'
 
 class Auth:
+    """
+    Authentication class.
+    """
     @staticmethod
     def check_auth(username, password):
-        """Überprüft die Authentifizierung."""
+        """
+        Check if a username/password combination is valid.
+        :type username: str
+        :type password: str
+        :rtype: bool
+        """
         return username == USERNAME and password == PASSWORD
 
     @staticmethod
