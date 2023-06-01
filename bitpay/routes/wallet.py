@@ -6,18 +6,22 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from jwt.exceptions import InvalidTokenError
 
+
 class Transaction(BaseModel):
     recipient: str
     amount: float
 
+
 class User(BaseModel):
     user_id: str
+
 
 router = APIRouter()
 security = HTTPBearer()
 config = ConfigManager()
 
-def authenticate_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+
+def authenticate_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
     try:
         token = credentials.credentials
         payload = jwt.decode(token, config.read_config("JWT", "secret_key"), algorithms=["HS256"])
@@ -28,32 +32,37 @@ def authenticate_user(credentials: HTTPAuthorizationCredentials = Depends(securi
         raise HTTPException(status_code=401, detail="Invalid token")
     raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
+
 @router.post("/create_key")
-def create_key(user: User = Depends(authenticate_user)):
+def create_key(user: User = Depends(authenticate_user)) -> dict:
     wallet = Wallet(user.user_id)
     wallet.create_key()
     return {"message": "Key created"}
 
+
 @router.delete("/delete_key")
-def delete_key(user: User = Depends(authenticate_user)):
+def delete_key(user: User = Depends(authenticate_user)) -> dict:
     wallet = Wallet(user.user_id)
     wallet.delete_key()
     return {"message": "Key deleted"}
 
+
 @router.get("/get_balance")
-def get_balance(user: User = Depends(authenticate_user)):
+def get_balance(user: User = Depends(authenticate_user)) -> dict:
     wallet = Wallet(user.user_id)
     balance = wallet.get_balance()
     return {"balance": balance}
 
+
 @router.get("/get_transaction_history")
-def get_transaction_history(user: User = Depends(authenticate_user)):
+def get_transaction_history(user: User = Depends(authenticate_user)) -> dict:
     wallet = Wallet(user.user_id)
     transactions = wallet.get_transaction_history()
     return {"transactions": transactions}
 
+
 @router.post("/send_transaction")
-def send_transaction(user: User = Depends(authenticate_user), transaction: Transaction):
+def send_transaction(transaction: Transaction, user: User = Depends(authenticate_user)):
     wallet = Wallet(user.user_id)
     try:
         wallet.send_transaction(transaction.recipient, transaction.amount)
@@ -61,14 +70,16 @@ def send_transaction(user: User = Depends(authenticate_user), transaction: Trans
         raise HTTPException(status_code=400, detail=str(e))
     return {"message": "Transaction sent"}
 
+
 @router.get("/get_transaction_status")
-def get_transaction_status(user: User = Depends(authenticate_user), tx_hash: str):
+def get_transaction_status(tx_hash: str, user: User = Depends(authenticate_user)):
     wallet = Wallet(user.user_id)
     tx_status = wallet.get_transaction_status(tx_hash)
     return {"transaction_status": tx_status}
 
+
 @router.get("/get_transaction_fee")
-def get_transaction_fee(user: User = Depends(authenticate_user), tx_hash: str):
+def get_transaction_fee(tx_hash: str, user: User = Depends(authenticate_user)):
     wallet = Wallet(user.user_id)
     tx_fee = wallet.get_transaction_fee(tx_hash)
     return {"transaction_fee": tx_fee}

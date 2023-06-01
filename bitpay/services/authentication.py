@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import request, jsonify
-# @ToDo: FastAPI
+# @ToDo: FastAPI instead of Flask
 # Beispielbenutzerdaten
 USERNAME = 'admin'
 PASSWORD = 'geheim'

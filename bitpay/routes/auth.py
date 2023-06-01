@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.security import HTTPBasicCredentials
 from bitpay.services.user import User
 
 router = APIRouter()
+
 
 @router.post("/register")
 def register_user(username: str, password: str):
@@ -12,10 +13,13 @@ def register_user(username: str, password: str):
     :param password:
     :return:
     """
-    User.register(username, password)
-    return {"message": "User registered"}
+    try:
+        User.register(username, password)
+        return {"message": "User registered"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-# Authentifizierung und Ausstellung eines JWT-Tokens
+
 @router.post("/login")
 def login(credentials: HTTPBasicCredentials):
     """
@@ -23,8 +27,9 @@ def login(credentials: HTTPBasicCredentials):
     :param credentials:
     :return:
     """
-    User.authenticate(credentials)
-    access_token = create_access_token(credentials.username)
-    return {"access_token": access_token}
-
-# Geschützte Route
+    try:
+        User.authenticate(credentials)
+        access_token = create_access_token(credentials.username)
+        return {"access_token": access_token}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

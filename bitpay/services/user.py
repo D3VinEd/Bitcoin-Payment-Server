@@ -6,12 +6,14 @@ from fastapi.security import HTTPBasicCredentials
 
 redis_db = redis.Redis(host='localhost', port=6379, db=0)
 
+
 class User:
     """
     User service
     """
+
     @staticmethod
-    def register(username: str, password: str):
+    def register(username: str, password: str) -> None:
         """
         Register a new user
         :param username:
@@ -25,7 +27,7 @@ class User:
         redis_db.set(username, hashed_password)
 
     @staticmethod
-    def authenticate(credentials: HTTPBasicCredentials, secret_key: str):
+    def authenticate(credentials: HTTPBasicCredentials, secret_key: str) -> str:
         """
         Authenticate a user
         :param credentials:
@@ -43,7 +45,7 @@ class User:
         return access_token
 
     @staticmethod
-    def get_user(username: str):
+    def get_user(username: str) -> dict:
         """
         Get user from redis
         :param username:
@@ -55,14 +57,13 @@ class User:
         return {"username": username}
 
     @staticmethod
-    def create_access_token(username: str, secret_key: str, expires_in_minutes: int = 30):
+    def create_access_token(username: str, secret_key: str,) -> str:
         """
         Create a new access token
         :param username:
         :param secret_key:
-        :param expires_in_minutes:
         :return:
         """
         payload = {"sub": username}
-        token = jwt.encode(payload, secret_key, algorithm="HS256")
+        token = jwt.encode(payload, secret_key, algorithm="HS256",)
         return token
