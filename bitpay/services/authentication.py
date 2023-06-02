@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import bcrypt
@@ -76,7 +78,7 @@ class Auth:
         Authenticate a user
         """
         hashed_password = redis.get_password(username)
-        if not hashed_password or not bcrypt.checkpw(password.encode(), hashed_password.encode()):
+        if not hashed_password or not bcrypt.checkpw(password.encode(), hashed_password):
             raise HTTPException(status_code=401, detail="")
 
         access_token = Auth.create_access_token(username)
@@ -89,7 +91,10 @@ class Auth:
         """
         secret_key = config.read_config("JWT", "secret_key")
         algorithm = config.read_config("JWT", "algorithm")
-        payload = {"sub": username}
+        ttl = config.read_config("JWT", "ttl_in_minutes")
+        payload = {"username": username,
+
+                   }
         token = jwt.encode(payload, secret_key, algorithm=algorithm)
         return token
 
