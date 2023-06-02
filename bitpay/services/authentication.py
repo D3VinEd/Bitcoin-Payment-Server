@@ -4,6 +4,8 @@ import bcrypt
 import jwt
 from bitpay.services.redis import RedisHandler
 from bitpay.services.config_manager import ConfigManager
+from bitpay.models import User
+
 
 app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -24,19 +26,19 @@ class Auth:
         stored_password = redis.get_password(username)
         return Auth.check_password(password, stored_password.decode())
 
-    @classmethod
-    def auth_required(cls, token: str = Depends(oauth2_scheme)):
+    @staticmethod
+    def auth_required(token: str = Depends(oauth2_scheme)) -> User:
         """
         Verify if a user is authenticated.
         """
-        username = cls.verify_token(token)
+        username = Auth.verify_token(token)
         if not redis.user_exists(username):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        return username
+        return User(username=username)
 
     @staticmethod
     def hash_password(password: str) -> str:
