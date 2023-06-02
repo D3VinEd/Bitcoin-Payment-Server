@@ -17,8 +17,6 @@ def create_key(user: User = Depends(Auth.auth_required)) -> dict:
     """
     wallet = Wallet(user.username)
     keys = wallet.create_keys()
-    print("router create_key")
-    print(keys)
     wallet.store_keys(keys)
     return {"hex_keys": [key.to_hex() for key in keys]}
 

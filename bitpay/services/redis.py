@@ -42,7 +42,7 @@ class RedisHandler:
         """
         return self.user_client.exists(username)
 
-    def delete_credentials(self, username) -> None:
+    def delete_user(self, username) -> None:
         """
         Delete credentials from redis
         :param username:
@@ -51,7 +51,6 @@ class RedisHandler:
         self.user_client.delete(username)
 
     # Wallet related methods
-
     def store_keys(self, username: str, key_hex_list: list) -> None:
         """
         Store the keys in the database
@@ -78,7 +77,5 @@ class RedisHandler:
         :return: List of key hex strings
         """
         keys = self.wallet_client.lrange(username, 0, -1)
-        print("get_keys")
-        print(keys)
         return [key.decode() for key in keys]
 

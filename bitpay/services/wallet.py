@@ -31,8 +31,6 @@ class Wallet:
         :return: List of Key objects
         """
         keys = [Key() for _ in range(num_keys)]
-        print("create_keys")
-        print(keys)
         return keys
 
     def delete_keys(self) -> None:
@@ -56,11 +54,7 @@ class Wallet:
         """
         balances = {}
         for key in self.keys:
-            print(key)
-            bitcoin_address = key.address
             balances[key.address] = key.get_balance('btc')
-        print("get_balance")
-        print(balances)
         return balances
 
     def get_transaction_history(self) -> list:

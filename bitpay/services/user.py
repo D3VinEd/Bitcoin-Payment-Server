@@ -41,4 +41,4 @@ class User:
         Delete a user
         """
         # Delete user from the database
-        redis.delete_credentials(self.username)
+        redis.delete_user(self.username)
