@@ -1,69 +1,44 @@
-import redis
-import bcrypt
-import jwt
 from fastapi import HTTPException
-from fastapi.security import HTTPBasicCredentials
+from fastapi.security import HTTPBasic
+from bitpay.services.redis import RedisHandler
+from bitpay.services.config_manager import ConfigManager
+from bitpay.services.authentication import Auth
 
-redis_db = redis.Redis(host='localhost', port=6379, db=0)
+security = HTTPBasic()
+redis = RedisHandler()
+config = ConfigManager()
 
 
 class User:
     """
     User service
     """
+    def __init__(self, username: str):
+        self.username = username
+        self.config = ConfigManager()
+        self.redis_client = RedisHandler()
 
-    @staticmethod
-    def register(username: str, password: str) -> None:
+    def register(self, password: str) -> None:
         """
         Register a new user
-        :param username:
-        :param password:
-        :return:
         """
-        if redis_db.get(username):
+        if redis.user_exists(self.username):
             raise HTTPException(status_code=409, detail="User already exists")
 
-        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-        redis_db.set(username, hashed_password)
+        hashed_password = Auth.hash_password(password)
+        redis.save_credentials(self.username, hashed_password)
 
-    @staticmethod
-    def authenticate(credentials: HTTPBasicCredentials, secret_key: str) -> str:
-        """
-        Authenticate a user
-        :param credentials:
-        :param secret_key:
-        :return:
-        """
-        username = credentials.username
-        password = credentials.password.encode()
-
-        hashed_password = redis_db.get(username)
-        if not hashed_password or not bcrypt.checkpw(password, hashed_password):
-            raise HTTPException(status_code=401, detail="")
-
-        access_token = create_access_token(username, secret_key)
-        return access_token
-
-    @staticmethod
-    def get_user(username: str) -> dict:
-        """
-        Get user from redis
-        :param username:
-        :return:
-        """
-        hashed_password = redis_db.get(username)
-        if not hashed_password:
+    def login(self, password: str) -> None:
+        if not self.redis_client.user_exists(self.username):
             raise HTTPException(status_code=404, detail="User not found")
-        return {"username": username}
 
-    @staticmethod
-    def create_access_token(username: str, secret_key: str,) -> str:
+        stored_password = self.redis_client.get_password(self.username)
+        if not Auth.check_password(password, stored_password.decode()): # @ToDo decode check
+            raise HTTPException(status_code=403, detail="Invalid password")
+
+    def delete(self):
         """
-        Create a new access token
-        :param username:
-        :param secret_key:
-        :return:
+        Delete a user
         """
-        payload = {"sub": username}
-        token = jwt.encode(payload, secret_key, algorithm="HS256",)
-        return token
+        # Delete user from the database
+        redis.delete_credentials(self.username)

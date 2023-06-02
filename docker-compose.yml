@@ -2,5 +2,6 @@ version: '3'
 services:
   redis:
     image: redis:latest
+    command: redis-server --requirepass test
     ports:
-      - "6379:6379"
+      - 6379:6379

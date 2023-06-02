@@ -8,15 +8,19 @@ class ConfigManager:
         self.config_file = config_file
         self.config.read(config_file)
 
-    def read_config(self, section, key) -> str:
+    def read_config(self, section, key) -> str | int | float:
         """
         Read a value from the config file
-        :param section:
-        :param key:
+        :param section: Section of the config file
+        :param key: Key of the config file
         :return: Value of the config file
         """
         try:
-            return self.config.get(section, key)
+            value = self.config.get(section, key)
+            if value.isdigit():
+                return int(value)
+            else:
+                return value  #
         except (NoSectionError, NoOptionError) as e:
             raise e
 

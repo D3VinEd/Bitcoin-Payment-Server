@@ -1,35 +1,37 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.security import HTTPBasicCredentials
 from bitpay.services.user import User
-
+from bitpay.services.authentication import Auth
+from pydantic import BaseModel
 router = APIRouter()
 
 
+class UserRegister(BaseModel):
+    username: str
+    password: str
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
 @router.post("/register")
-def register_user(username: str, password: str):
-    """
-    Register a new user
-    :param username:
-    :param password:
-    :return:
-    """
+def register_user(user: UserRegister):  # user parameter is of type UserRegister now
     try:
-        User.register(username, password)
+        user_instance = User(user.username)
+        user_instance.register(user.password)
         return {"message": "User registered"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/login")
-def login(credentials: HTTPBasicCredentials):
-    """
-    Login a user
-    :param credentials:
-    :return:
-    """
+def login(user: UserLogin):  # user parameter is of type UserLogin now
     try:
-        User.authenticate(credentials)
-        access_token = create_access_token(credentials.username)
+        user_instance = User(user.username)
+        user_instance.login(user.password)
+        access_token = Auth.create_access_token(user.username)
         return {"access_token": access_token}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
