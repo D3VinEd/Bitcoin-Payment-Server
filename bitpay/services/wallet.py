@@ -18,7 +18,7 @@ class Wallet:
         """
         key_hex_list = self.redis.get_keys(self.username)
         if key_hex_list:
-            return [self.get_key_from_hex(key_hex) for key_hex in key_hex_list]
+            return [Key.from_hex(key_hex) for key_hex in key_hex_list]
         else:
             keys = self.create_keys()
             self.store_keys(keys)
@@ -48,23 +48,6 @@ class Wallet:
         """
         key_hex_list = [key.to_hex() for key in keys]
         self.redis.store_keys(self.username, key_hex_list)
-
-    def get_or_create_keys(self) -> list:
-        """
-        Get existing keys from the database or create new ones if not found
-        :return: List of Key objects
-        """
-        key_hex_list = self.redis.get_keys(self.username)
-        if key_hex_list:
-            print("get_or_create_keys")
-            print(key_hex_list)
-            return [Key.from_hex(key_hex) for key_hex in key_hex_list]
-        else:
-            print("get_or_create_keys_2")
-            keys = self.create_keys()
-            print(keys)
-            self.store_keys(keys)
-            return keys
 
     def get_balance(self) -> dict:
         """
@@ -131,3 +114,10 @@ class Wallet:
             return self.keys[key_index]
         else:
             raise IndexError('Key index out of range')
+
+    def get_keys(self) -> list:
+        """
+        Get all keys
+        :return: List of Key objects
+        """
+        return self.keys

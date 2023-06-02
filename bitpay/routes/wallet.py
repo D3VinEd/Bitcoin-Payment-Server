@@ -23,6 +23,18 @@ def create_key(user: User = Depends(Auth.auth_required)) -> dict:
     return {"hex_keys": [key.to_hex() for key in keys]}
 
 
+@router.get("/get_keys")
+def get_keys(user: User = Depends(Auth.auth_required)) -> dict:
+    """
+    Get the keys for the user
+    :param user:
+    :return:
+    """
+    wallet = Wallet(user.username)
+    keys = wallet.get_keys()
+    return {"hex_keys": [key.to_hex() for key in keys]}
+
+
 @router.delete("/delete_key")
 def delete_key(user: User = Depends(Auth.auth_required)) -> dict:
     """
