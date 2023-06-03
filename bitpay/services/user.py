@@ -14,7 +14,10 @@ class User:
     User service
     """
     def __init__(self, username: str):
-        self.username = username
+        if self.check_user_exists(self.username):
+            raise HTTPException(status_code=409, detail="User already exists")
+        else:
+            self.username = username
         self.config = ConfigManager()
         self.redis_client = RedisHandler()
 
@@ -42,3 +45,9 @@ class User:
         """
         # Delete user from the database
         redis.delete_user(self.username)
+
+    def check_user_exists(self, username: str) -> int:
+        """
+        Check if a user exists
+        """
+        return self.redis_client.user_exists(username)
