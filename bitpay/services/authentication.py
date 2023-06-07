@@ -21,7 +21,7 @@ class Auth:
     """
 
     @staticmethod
-    def check_auth(username: str, password: str):
+    def check_auth(username: str, password: str) -> bool:
         """
         Check if a username/password combination is valid.
         """
@@ -50,7 +50,7 @@ class Auth:
         return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     @staticmethod
-    def verify_token(token: str = Depends(oauth2_scheme)):
+    def verify_token(token: str = Depends(oauth2_scheme)) -> str:
         """
         Verifies a JWT token.
         """
