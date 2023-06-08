@@ -93,6 +93,7 @@ def get_transaction_status(tx_hash: str, user: User = Depends(Auth.auth_required
     :param user:
     :return:
     """
+    print(tx_hash)
     wallet = Wallet(user.username)
     tx_status = wallet.get_transaction_status(tx_hash)
     return {"transaction_status": tx_status}

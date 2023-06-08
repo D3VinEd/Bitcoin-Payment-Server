@@ -9,12 +9,14 @@ class RedisHandler:
             host=self.config.read_config("REDIS", "host"),
             port=self.config.read_config("REDIS", "port"),
             db=self.config.read_config("REDIS", "user_db"),
-            password=self.config.read_config("REDIS", "password"))
+            password=self.config.read_config("REDIS", "password")
+        )
         self.wallet_client = redis.Redis(
             host=self.config.read_config("REDIS", "host"),
             port=self.config.read_config("REDIS", "port"),
             db=self.config.read_config("REDIS", "wallet_db"),
-            password=self.config.read_config("REDIS", "password"))
+            password=self.config.read_config("REDIS", "password")
+        )
 
     # User related methods
     def save_credentials(self, username, hashed_password) -> None:
@@ -40,7 +42,7 @@ class RedisHandler:
         :param username:
         :return:
         """
-        return self.user_client.exists(username)
+        return bool(self.user_client.exists(username))
 
     def delete_user(self, username) -> None:
         """

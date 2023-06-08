@@ -14,7 +14,10 @@ limiter = Limiter(key_func=get_remote_address)
 @limiter.limit("2/minute", error_message="Too many requests")
 def register_user(user: UserRegister, request: Request):
     try:
+        print(user)
+        print(user.username)
         user_instance = User(user.username)
+        print(user_instance)
         user_instance.register(user.password)
         return {"message": "User registered"}
     except Exception as e:

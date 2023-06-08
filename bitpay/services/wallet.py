@@ -59,12 +59,20 @@ class Wallet:
 
     def get_transaction_history(self) -> list:
         """
-        Get the transaction history of all keys
+        Get the transaction history of all keys.
+
         :return: List of transactions
         """
+        # Initialisiere eine leere Liste, um die Transaktionen zu speichern.
         transactions = []
+
+        # Gehe durch jeden Schlüssel in self.keys
         for key in self.keys:
+            # Ruft die Transaktionen für den aktuellen Schlüssel ab
+            # und fügt sie der Liste der Transaktionen hinzu.
             transactions.extend(key.get_transactions())
+
+        # Gibt die Liste der Transaktionen zurück.
         return transactions
 
     def send_transaction(self, recipient: str, amount: float, key_index: int = 0) -> None:
@@ -83,10 +91,11 @@ class Wallet:
         :param tx_hash: Transaction hash
         :return: Transaction status as a dictionary
         """
+        tx_list = []
         for key in self.keys:
             tx_status = key.get_transaction(tx_hash)
             if tx_status:
-                return tx_status
+                tx_status['key'] = key.address
         return {}
 
     def get_transaction_fee(self, tx_hash):
